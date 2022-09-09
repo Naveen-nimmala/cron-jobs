@@ -1,0 +1,8 @@
+
+identitymappings:
+- name: "test2"
+  time: "* * * * *"
+  user: "user1"
+- name: "test1"
+  time: "* * * * *"
+  user: "user2"
