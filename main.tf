@@ -1,19 +1,37 @@
+
+resource "kubernetes_config_map" "example-2" {
+  metadata {
+    name = "my-yaml"
+  }
+
+  data = {
+    "my-yaml.yml" = "${file("./test.yml")}"
+  }
+
+}
+
+resource "kubernetes_config_map" "example-3" {
+  metadata {
+    name = "my-update"
+  }
+
+  data = {
+    "update.sh" = "${file("./update.sh")}"
+  }
+
+}
+
 resource "kubernetes_manifest" "configmap_scripts_configmap" {
   manifest = {
     "apiVersion" = "v1"
     "data" = {
       "run.sh" = <<-EOT
       #!/bin/bash
-
-      apt-get update && apt-get install -y cron vim curl jq
-      curl  https://dummyjson.com/products/1 | jq '.brand' >> /tmp/out.txt
-      crontab -l ; echo "* * * * * echo "Hello crontab" >> /var/log/cron.log" | crontab -
-      cron -f
-      echo "Hello from the script residing in helm chart." >> /var/log/cron.log
-      echo "New line added here." >> /var/log/cron.log
-      echo "Sleeping for eternity!" >> /var/log/cron.log
-      sleep infinity
-
+      apt-get update && apt-get install -y cron vim jq curl python3-pip
+      pip3 install yq
+      service cron start
+      /bin/bash /update/update.sh &
+      /bin/bash /cron-tab/my_config_file.sh
       EOT
     }
     "kind" = "ConfigMap"
@@ -23,6 +41,20 @@ resource "kubernetes_manifest" "configmap_scripts_configmap" {
     }
   }
 }
+
+resource "kubernetes_config_map" "example" {
+  metadata {
+    name = "my-config"
+  }
+
+  data = {
+    "my_config_file.sh" = "${file("./final.sh")}"
+  }
+
+}
+
+
+
 
 
 resource "kubernetes_manifest" "deployment_my_deploy" {
@@ -43,10 +75,8 @@ resource "kubernetes_manifest" "deployment_my_deploy" {
           "app" = "my-deploy"
         }
       }
-      "strategy" = {}
       "template" = {
         "metadata" = {
-          "creationTimestamp" = null
           "labels" = {
             "app" = "my-deploy"
           }
@@ -64,8 +94,20 @@ resource "kubernetes_manifest" "deployment_my_deploy" {
               "name"  = "new-deploy-3"
               "volumeMounts" = [
                 {
-                  "mountPath" = "/scripts-dir"
+                  "mountPath" = "/scripts-dir/"
                   "name"      = "scripts-vol"
+                },
+                {
+                  "mountPath" = "/cron-tab/"
+                  "name"      = "cron-tab"
+                },
+                {
+                  "mountPath" = "/data/"
+                  "name"      = "my-yaml"
+                },
+                {
+                  "mountPath" = "/update/"
+                  "name"      = "my-update"
                 },
               ]
             },
@@ -77,9 +119,30 @@ resource "kubernetes_manifest" "deployment_my_deploy" {
               }
               "name" = "scripts-vol"
             },
+            {
+              "configMap" = {
+                "name" = "my-config"
+              }
+              "name" = "cron-tab"
+            },
+            {
+              "configMap" = {
+                "name" = "my-yaml"
+              }
+              "name" = "my-yaml"
+            },
+            {
+              "configMap" = {
+                "name" = "my-update"
+              }
+              "name" = "my-update"
+            },
           ]
         }
       }
     }
   }
 }
+
+
+
