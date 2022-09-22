@@ -1,0 +1,8 @@
+#Default NameSpcae 
+namespace: stg
+
+#Default Image to run CronJob
+image: nginx:latest
+
+#Default State of All Cronjobs
+state: absent

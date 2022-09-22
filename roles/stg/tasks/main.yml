@@ -1,0 +1,24 @@
+
+- name: Make deployment state={{ state }}
+  k8s:
+    state: "{{ state }}"
+    namespace: "{{ namespace }}"
+    definition: "{{ lookup('template', 'deployment.yaml.j2') | from_yaml }}"
+  vars:
+    name: naveen-1
+
+- name: Make deployment 
+  k8s:
+    state: "{{ state }}"
+    namespace: "{{ namespace }}"
+    definition: "{{ lookup('template', 'deployment.yaml.j2') | from_yaml }}"
+  vars:
+    name: naveen
+
+- name: Make new 
+  k8s:
+    state: "{{ state }}"
+    namespace: "{{ namespace }}"
+    definition: "{{ lookup('template', 'deployment.yaml.j2') | from_yaml }}"
+  vars:
+    name: final-test

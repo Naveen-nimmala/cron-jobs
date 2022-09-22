@@ -1,0 +1,7 @@
+apiVersion: v1
+data:
+  script.sh: |
+    curl -I https://{{ DOMAIN_NAME }}
+kind: ConfigMap
+metadata:
+  name: {{ jobName }}
