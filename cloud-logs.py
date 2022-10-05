@@ -15,7 +15,6 @@ logging.getLogger('botocore').setLevel(logging.CRITICAL)
 DEFAULT_RETENTION_PERIOD_IN_DAYS = 120
 VALID_RETENTION_PERIOD_VALUES = [1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, 2192, 2557, 2922, 3288, 3653]
 
-LOG_GROUPS = ["test"]
 regions = ["eu-west-1"]
 
 # Making sure we configure our boto3 client with a different Retry Configuration
@@ -58,7 +57,7 @@ def lambda_handler(event, context):
                         LOGGER.info(f"Retention is not set for {group['logGroupName']} LogGroup,in {aws_region}")
                         RETENTION_PERIOD_IN_DAYS = int(row[1]) if  len(row) > 1 else DEFAULT_RETENTION_PERIOD_IN_DAYS
                         if RETENTION_PERIOD_IN_DAYS not in VALID_RETENTION_PERIOD_VALUES:
-                            return {'statusCode': 200, 'body': '`DEFAULT_RETENTION_PERIOD_IN_DAYS` is set to `' + str(RETENTION_PERIOD_IN_DAYS) + '`. Valid values are  1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, and 3653.'}
+                            return {'statusCode': 200, 'body': '`RETENTION_PERIOD_IN_DAYS` is set to `' + str(RETENTION_PERIOD_IN_DAYS) + '`. Valid values are  1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, and 3653.'}
                         setRetention = client.put_retention_policy(
                             logGroupName=group['logGroupName'],
                             retentionInDays = RETENTION_PERIOD_IN_DAYS
