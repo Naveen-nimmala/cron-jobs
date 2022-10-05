@@ -45,7 +45,7 @@ def lambda_handler():
                 logGroupName=group['logGroupName']
             else:
                 print(f"Retention is not set for {group['logGroupName']} LogGroup,in {aws_region}")
-                setretention = client.put_retention_policy(
+                setRetention = client.put_retention_policy(
                     logGroupName=group['logGroupName'],
                     retentionInDays= RETENTION_PERIOD_IN_DAYS
                     )
