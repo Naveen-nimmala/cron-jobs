@@ -1,6 +1,14 @@
 import boto3
 from botocore.config import Config
 import os
+import logging
+
+
+# Appropriate logging
+LOGGER = logging.getLogger()
+LOGGER.setLevel(logging.INFO)
+logging.getLogger('boto3').setLevel(logging.CRITICAL)
+logging.getLogger('botocore').setLevel(logging.CRITICAL)
 
 
 RETENTION_PERIOD_IN_DAYS = 30
@@ -16,8 +24,10 @@ custom_config = Config(
    }
 )
  
-def lambda_handler():
-    
+def lambda_handler(event, context):
+
+    LOGGER.info(f"Regions to be scanned = {regions}")
+    LOGGER.info(f"Retention period to be set = {RETENTION_PERIOD_IN_DAYS}")
     # test retention period for a valid value
     if RETENTION_PERIOD_IN_DAYS not in VALID_RETENTION_PERIOD_VALUES:
         return {'statusCode': 200, 'body': '`RETENTION_PERIOD_IN_DAYS` is set to `' + str(RETENTION_PERIOD_IN_DAYS) + '`. Valid values are  1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, and 3653.'}
@@ -41,17 +51,14 @@ def lambda_handler():
  
         for group in retention:
             if 'retentionInDays' in group.keys():
-                print(f"Retention is already set for {group['logGroupName']} LogGroup, {group['retentionInDays']} in {aws_region}")
+                LOGGER.info(f"Retention is already set for {group['logGroupName']} LogGroup, {group['retentionInDays']} in {aws_region}")
                 logGroupName=group['logGroupName']
             else:
-                print(f"Retention is not set for {group['logGroupName']} LogGroup,in {aws_region}")
+                LOGGER.info(f"Retention is not set for {group['logGroupName']} LogGroup,in {aws_region}")
                 setRetention = client.put_retention_policy(
                     logGroupName=group['logGroupName'],
                     retentionInDays= RETENTION_PERIOD_IN_DAYS
                     )
-                print(f"Retention updated for {logGroupName} Log Group with {RETENTION_PERIOD_IN_DAYS} days")
+                LOGGER.info(f"Retention updated for {logGroupName} Log Group with {RETENTION_PERIOD_IN_DAYS} days")
     
     return {'statusCode': 200, 'body': 'Process completed.'}
-
-if __name__ == '__main__':
-    lambda_handler()
